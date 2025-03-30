@@ -14,7 +14,19 @@ export default function FormScreen({ navigation }) {
 
   const handleSave = async () => {
     if (task.trim()) {
-      await AsyncStorage.setItem("task", task);
+      const storedTasks = await AsyncStorage.getItem("tasks");
+      const taskList = storedTasks ? JSON.parse(storedTasks) : [];
+      const newTask = {
+        id: Date.now().toString(),
+        title: task,
+        completed: false,
+      };
+
+      const updatedTasks = [...taskList, newTask];
+      await AsyncStorage.setItem("tasks", JSON.stringify(updatedTasks));
+
+      setTask("");
+
       navigation.navigate("Summary");
     }
   };
@@ -34,6 +46,7 @@ export default function FormScreen({ navigation }) {
         onChangeText={setTask}
       />
       <Button title="Salvar" onPress={handleSave} />
+      <Button title="Ver Tarefas" onPress={() => navigation.navigate("Summary")} />
     </Container>
   );
 }
